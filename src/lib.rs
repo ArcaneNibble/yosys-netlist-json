@@ -217,6 +217,15 @@ pub struct Netname {
     pub hide_name: usize,
     /// Bit value(s) that should be given this name
     pub bits: Vec<BitVal>,
+    /// Bit offset for mapping to HDL bit numbering
+    #[serde(default)]
+    pub offset: usize,
+    /// Whether or not HDL bit numbering is MSB-first
+    #[serde(default)]
+    pub upto: usize,
+    /// Whether or not HDL considers value signed
+    #[serde(default)]
+    pub signed: usize,
     /// Attributes for this netname
     #[serde(default)]
     pub attributes: HashMap<String, AttributeVal>,
