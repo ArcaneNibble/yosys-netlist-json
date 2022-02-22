@@ -2,3 +2,20 @@
 [![Docs.rs](https://img.shields.io/badge/docs.rs-yosys--netlist--json-informational.svg)](https://docs.rs/yosys-netlist-json)
 
 # Yosys JSON netlist serde structures
+
+Read/write [Yosys](https://github.com/YosysHQ/yosys) JSON files in Rust using serde.
+
+## Reading
+
+```rust
+// from a byte slice
+let result = Netlist::from_slice(...).unwrap();
+
+// from an io::Read
+let result = Netlist::from_reader(reader).unwrap();
+```
+
+## Writing
+
+```rust
+```
