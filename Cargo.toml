@@ -1,6 +1,6 @@
 [package]
 name = "yosys-netlist-json"
-version = "0.0.4"
+version = "0.1.0"
 authors = ["R <rqou@berkeley.edu>"]
 license = "0BSD"
 description = "A library for working with Yosys netlists in JSON format"
