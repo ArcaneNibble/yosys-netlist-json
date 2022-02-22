@@ -152,9 +152,12 @@ pub struct Netlist {
 /// Represents one module in the Yosys hierarchy
 #[derive(Clone, Serialize, Deserialize, Debug, Default, Eq, PartialEq)]
 pub struct Module {
-    /// Module attributes
+    /// Module attributes (Verilog `(* attr *)`)
     #[serde(default)]
     pub attributes: HashMap<String, AttributeVal>,
+    /// Module parameter (Verilog `parameter`) default values
+    #[serde(default)]
+    pub parameter_default_values: HashMap<String, AttributeVal>,
     /// Module ports (interfaces to other modules)
     #[serde(default)]
     pub ports: HashMap<String, Port>,
