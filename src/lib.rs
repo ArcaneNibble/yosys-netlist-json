@@ -253,6 +253,14 @@ pub struct Netname {
 }
 
 impl Netlist {
+    /// Create a new netlist
+    pub fn new(creator: &str) -> Self {
+        Self {
+            creator: creator.to_owned(),
+            modules: HashMap::new(),
+        }
+    }
+
     /// Read netlist data from a reader
     pub fn from_reader<R: Read>(reader: R) -> Result<Netlist, serde_json::Error> {
         serde_json::from_reader(reader)
@@ -571,5 +579,13 @@ mod tests {
         assert_eq!(mod_test.ports.get("o").unwrap().upto, 0);
 
         assert_eq!(mod_test.memories.get("testmemory").unwrap().size, 1111);
+    }
+
+    #[test]
+    fn write_test() {
+        let netlist = Netlist::new("integration test");
+        let json = netlist.to_string().unwrap();
+
+        assert_eq!(json, r#"{"creator":"integration test","modules":{}}"#);
     }
 }

@@ -18,4 +18,7 @@ let result = Netlist::from_reader(reader).unwrap();
 ## Writing
 
 ```rust
+let mut netlist = Netlist::new("Super cool HDL tool");
+...
+let json = netlist.to_string().unwrap();
 ```
