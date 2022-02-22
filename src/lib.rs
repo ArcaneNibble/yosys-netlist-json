@@ -164,6 +164,9 @@ pub struct Module {
     /// Module cells (objects inside this module)
     #[serde(default)]
     pub cells: HashMap<String, Cell>,
+    /// Module memories
+    #[serde(default)]
+    pub memories: HashMap<String, Memory>,
     /// Module netnames (names of wires in this module)
     #[serde(default)]
     pub netnames: HashMap<String, Netname>,
@@ -207,6 +210,24 @@ pub struct Cell {
     pub port_directions: HashMap<String, PortDirection>,
     /// Bit value(s) representing the wire(s) connected to the inputs/outputs of this cell
     pub connections: HashMap<String, Vec<BitVal>>,
+}
+
+/// Represents a memory in a module
+#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq)]
+pub struct Memory {
+    /// Indicates an internal/auto-generated name that starts with `$`
+    #[serde(default)]
+    pub hide_name: usize,
+    /// Attributes for this memory
+    #[serde(default)]
+    pub attributes: HashMap<String, AttributeVal>,
+    /// Memory width
+    pub width: usize,
+    /// Memory size
+    pub size: usize,
+    /// Lowest valid memory address
+    #[serde(default)]
+    pub start_offset: usize,
 }
 
 /// Represents the name of a net in a module
