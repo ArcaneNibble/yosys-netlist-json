@@ -442,4 +442,134 @@ mod tests {
         )
         .unwrap();
     }
+
+    #[test]
+    fn integration_test() {
+        let result = Netlist::from_slice(
+            br#"{
+  "creator": "Yosys 0.14+51 (git sha1 286caa09b, gcc 9.3.0-13 -fPIC -Os)",
+  "modules": {
+    "test": {
+      "attributes": {
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "test-for-json.v:1.1-12.10"
+      },
+      "parameter_default_values": {
+        "TESTPARAM": "00000000000000001010010001010101"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "offset": 1,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "b": {
+          "direction": "input",
+          "upto": 1,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        },
+        "o": {
+          "direction": "output",
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ]
+        }
+      },
+      "cells": {
+        "$xor$test-for-json.v:10$1": {
+          "hide_name": 1,
+          "type": "$xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "test-for-json.v:10.12-10.17"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+            "Y": [ 18, 19, 20, 21, 22, 23, 24, 25 ]
+          }
+        }
+      },
+      "memories": {
+        "testmemory": {
+          "hide_name": 0,
+          "attributes": {
+            "src": "test-for-json.v:8.12-8.22"
+          },
+          "width": 8,
+          "start_offset": 1,
+          "size": 1111
+        }
+      },
+      "netnames": {
+        "$xor$test-for-json.v:10$1_Y": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "test-for-json.v:10.12-10.17"
+          }
+        },
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "offset": 1,
+          "attributes": {
+            "src": "test-for-json.v:2.17-2.18"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "upto": 1,
+          "attributes": {
+            "src": "test-for-json.v:3.17-3.18"
+          }
+        },
+        "o": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "test-for-json.v:4.18-4.19"
+          }
+        }
+      }
+    }
+  }
+}
+"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            result.creator,
+            "Yosys 0.14+51 (git sha1 286caa09b, gcc 9.3.0-13 -fPIC -Os)"
+        );
+        let mod_test = result.modules.get("test").unwrap();
+
+        assert_eq!(
+            mod_test
+                .parameter_default_values
+                .get("TESTPARAM")
+                .unwrap()
+                .to_number()
+                .unwrap(),
+            42069
+        );
+
+        assert_eq!(mod_test.ports.get("a").unwrap().offset, 1);
+        assert_eq!(mod_test.ports.get("b").unwrap().upto, 1);
+        assert_eq!(mod_test.ports.get("o").unwrap().offset, 0);
+        assert_eq!(mod_test.ports.get("o").unwrap().upto, 0);
+
+        assert_eq!(mod_test.memories.get("testmemory").unwrap().size, 1111);
+    }
 }
