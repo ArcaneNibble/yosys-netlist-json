@@ -30,6 +30,7 @@ pub enum SpecialBit {
     Z,
 }
 
+#[cfg(feature = "slog")]
 impl slog::Value for SpecialBit {
     fn serialize(
         &self,
@@ -56,6 +57,7 @@ pub enum BitVal {
     S(SpecialBit),
 }
 
+#[cfg(feature = "slog")]
 impl slog::Value for BitVal {
     fn serialize(
         &self,
@@ -121,6 +123,7 @@ impl AttributeVal {
     }
 }
 
+#[cfg(feature = "slog")]
 impl slog::Value for AttributeVal {
     fn serialize(
         &self,
