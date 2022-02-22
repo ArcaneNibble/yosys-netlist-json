@@ -31,7 +31,12 @@ pub enum SpecialBit {
 }
 
 impl slog::Value for SpecialBit {
-    fn serialize(&self, _record: &slog::Record, key: slog::Key, serializer: &mut dyn slog::Serializer) -> slog::Result {
+    fn serialize(
+        &self,
+        _record: &slog::Record,
+        key: slog::Key,
+        serializer: &mut dyn slog::Serializer,
+    ) -> slog::Result {
         match self {
             &SpecialBit::_0 => serializer.emit_str(key, "0"),
             &SpecialBit::_1 => serializer.emit_str(key, "1"),
@@ -48,18 +53,19 @@ pub enum BitVal {
     /// An actual signal number
     N(usize),
     /// A special constant value
-    S(SpecialBit)
+    S(SpecialBit),
 }
 
 impl slog::Value for BitVal {
-    fn serialize(&self, record: &slog::Record, key: slog::Key, serializer: &mut dyn slog::Serializer) -> slog::Result {
+    fn serialize(
+        &self,
+        record: &slog::Record,
+        key: slog::Key,
+        serializer: &mut dyn slog::Serializer,
+    ) -> slog::Result {
         match self {
-            &BitVal::N(n) => {
-                serializer.emit_usize(key, n)
-            },
-            &BitVal::S(s) => {
-                s.serialize(record, key, serializer)
-            }
+            &BitVal::N(n) => serializer.emit_usize(key, n),
+            &BitVal::S(s) => s.serialize(record, key, serializer),
         }
     }
 }
@@ -96,7 +102,10 @@ impl AttributeVal {
                 if s.len() == 0 {
                     // If it's an empty string then it wasn't originally a string
                     None
-                } else if s.find(|c| !(c == '0' || c == '1' || c == 'x' || c == 'z')).is_none() {
+                } else if s
+                    .find(|c| !(c == '0' || c == '1' || c == 'x' || c == 'z'))
+                    .is_none()
+                {
                     // If it only contains 01xz, then it wasn't originally a string
                     None
                 } else {
@@ -113,14 +122,15 @@ impl AttributeVal {
 }
 
 impl slog::Value for AttributeVal {
-    fn serialize(&self, _record: &slog::Record, key: slog::Key, serializer: &mut dyn slog::Serializer) -> slog::Result {
+    fn serialize(
+        &self,
+        _record: &slog::Record,
+        key: slog::Key,
+        serializer: &mut dyn slog::Serializer,
+    ) -> slog::Result {
         match self {
-            &AttributeVal::N(n) => {
-                serializer.emit_usize(key, n)
-            },
-            &AttributeVal::S(ref s) => {
-                serializer.emit_str(key, s)
-            }
+            &AttributeVal::N(n) => serializer.emit_usize(key, n),
+            &AttributeVal::S(ref s) => serializer.emit_str(key, s),
         }
     }
 }
@@ -169,7 +179,7 @@ pub struct Cell {
     #[serde(default)]
     pub hide_name: usize,
     /// Name of the type of this cell
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub cell_type: String,
     /// Parameters specified on this cell
     #[serde(default)]
@@ -225,38 +235,48 @@ mod tests {
 
     #[test]
     fn super_empty_json() {
-        let result = Netlist::from_slice(br#"
-            {}"#).unwrap();
+        let result = Netlist::from_slice(
+            br#"
+            {}"#,
+        )
+        .unwrap();
         assert_eq!(result.creator, "");
         assert_eq!(result.modules.len(), 0);
     }
 
     #[test]
     fn empty_json() {
-        let result = Netlist::from_slice(br#"
+        let result = Netlist::from_slice(
+            br#"
             {
               "creator": "this is a test",
               "modules": {
               }
-            }"#).unwrap();
+            }"#,
+        )
+        .unwrap();
         assert_eq!(result.creator, "this is a test");
         assert_eq!(result.modules.len(), 0);
     }
 
     #[test]
     fn empty_json_2() {
-        let result = Netlist::from_slice(br#"
+        let result = Netlist::from_slice(
+            br#"
             {
               "modules": {
               }
-            }"#).unwrap();
+            }"#,
+        )
+        .unwrap();
         assert_eq!(result.creator, "");
         assert_eq!(result.modules.len(), 0);
     }
 
     #[test]
     fn bit_values_test() {
-        let result = Netlist::from_slice(br#"
+        let result = Netlist::from_slice(
+            br#"
             {
               "modules": {
                 "mymodule": {
@@ -270,16 +290,36 @@ mod tests {
                   }
                 }
               }
-            }"#).unwrap();
-        assert_eq!(result.modules.get("mymodule").unwrap().cells.get("mycell").unwrap().connections.get("IN").unwrap(),
-            &vec![BitVal::S(SpecialBit::X), BitVal::N(0), BitVal::S(SpecialBit::Z), BitVal::N(234),
-                BitVal::S(SpecialBit::_1), BitVal::S(SpecialBit::_0)]);
+            }"#,
+        )
+        .unwrap();
+        assert_eq!(
+            result
+                .modules
+                .get("mymodule")
+                .unwrap()
+                .cells
+                .get("mycell")
+                .unwrap()
+                .connections
+                .get("IN")
+                .unwrap(),
+            &vec![
+                BitVal::S(SpecialBit::X),
+                BitVal::N(0),
+                BitVal::S(SpecialBit::Z),
+                BitVal::N(234),
+                BitVal::S(SpecialBit::_1),
+                BitVal::S(SpecialBit::_0)
+            ]
+        );
     }
 
     #[test]
     #[should_panic]
     fn invalid_bit_value_test() {
-        Netlist::from_slice(br#"
+        Netlist::from_slice(
+            br#"
             {
               "modules": {
                 "mymodule": {
@@ -293,12 +333,15 @@ mod tests {
                   }
                 }
               }
-            }"#).unwrap();
+            }"#,
+        )
+        .unwrap();
     }
 
     #[test]
     fn attribute_value_test() {
-        let result = Netlist::from_slice(br#"
+        let result = Netlist::from_slice(
+            br#"
             {
               "modules": {
                 "mymodule": {
@@ -313,15 +356,29 @@ mod tests {
                   }
                 }
               }
-            }"#).unwrap();
-        assert_eq!(result.modules.get("mymodule").unwrap().cells.get("mycell").unwrap()
-            .parameters.get("testparam").unwrap(), &AttributeVal::N(123));
+            }"#,
+        )
+        .unwrap();
+        assert_eq!(
+            result
+                .modules
+                .get("mymodule")
+                .unwrap()
+                .cells
+                .get("mycell")
+                .unwrap()
+                .parameters
+                .get("testparam")
+                .unwrap(),
+            &AttributeVal::N(123)
+        );
     }
 
     #[test]
     #[should_panic]
     fn invalid_attribute_value_test() {
-        Netlist::from_slice(br#"
+        Netlist::from_slice(
+            br#"
             {
               "modules": {
                 "mymodule": {
@@ -336,6 +393,8 @@ mod tests {
                   }
                 }
               }
-            }"#).unwrap();
+            }"#,
+        )
+        .unwrap();
     }
 }
