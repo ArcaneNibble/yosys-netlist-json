@@ -176,6 +176,15 @@ pub struct Port {
     pub direction: PortDirection,
     /// Bit value(s) representing the wire(s) connected to this port
     pub bits: Vec<BitVal>,
+    /// Bit offset for mapping to HDL bit numbering
+    #[serde(default)]
+    pub offset: usize,
+    /// Whether or not HDL bit numbering is MSB-first
+    #[serde(default)]
+    pub upto: usize,
+    /// Whether or not HDL considers value signed
+    #[serde(default)]
+    pub signed: usize,
 }
 
 /// Represents a cell in a module
