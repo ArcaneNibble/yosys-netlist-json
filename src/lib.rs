@@ -1,5 +1,5 @@
+use indexmap::IndexMap;
 use serde_derive::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::io::{Read, Write};
 
 /// Legal values for the direction of a port on a module
@@ -146,7 +146,7 @@ pub struct Netlist {
     pub creator: String,
     /// A map from module names to module objects contained in this .json file
     #[serde(default)]
-    pub modules: HashMap<String, Module>,
+    pub modules: IndexMap<String, Module>,
 }
 
 /// Represents one module in the Yosys hierarchy
@@ -154,22 +154,22 @@ pub struct Netlist {
 pub struct Module {
     /// Module attributes (Verilog `(* attr *)`)
     #[serde(default)]
-    pub attributes: HashMap<String, AttributeVal>,
+    pub attributes: IndexMap<String, AttributeVal>,
     /// Module parameter (Verilog `parameter`) default values
     #[serde(default)]
-    pub parameter_default_values: HashMap<String, AttributeVal>,
+    pub parameter_default_values: IndexMap<String, AttributeVal>,
     /// Module ports (interfaces to other modules)
     #[serde(default)]
-    pub ports: HashMap<String, Port>,
+    pub ports: IndexMap<String, Port>,
     /// Module cells (objects inside this module)
     #[serde(default)]
-    pub cells: HashMap<String, Cell>,
+    pub cells: IndexMap<String, Cell>,
     /// Module memories
     #[serde(default)]
-    pub memories: HashMap<String, Memory>,
+    pub memories: IndexMap<String, Memory>,
     /// Module netnames (names of wires in this module)
     #[serde(default)]
-    pub netnames: HashMap<String, Netname>,
+    pub netnames: IndexMap<String, Netname>,
 }
 
 /// Represents a port on a module
@@ -191,7 +191,7 @@ pub struct Port {
 }
 
 /// Represents a cell in a module
-#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Default)]
 pub struct Cell {
     /// Indicates an internal/auto-generated name that starts with `$`
     #[serde(default)]
@@ -201,15 +201,15 @@ pub struct Cell {
     pub cell_type: String,
     /// Parameters specified on this cell
     #[serde(default)]
-    pub parameters: HashMap<String, AttributeVal>,
+    pub parameters: IndexMap<String, AttributeVal>,
     /// Attributes specified on this cell
     #[serde(default)]
-    pub attributes: HashMap<String, AttributeVal>,
+    pub attributes: IndexMap<String, AttributeVal>,
     /// The direction of the ports on this cell
     #[serde(default)]
-    pub port_directions: HashMap<String, PortDirection>,
+    pub port_directions: IndexMap<String, PortDirection>,
     /// Bit value(s) representing the wire(s) connected to the inputs/outputs of this cell
-    pub connections: HashMap<String, Vec<BitVal>>,
+    pub connections: IndexMap<String, Vec<BitVal>>,
 }
 
 /// Represents a memory in a module
@@ -220,7 +220,7 @@ pub struct Memory {
     pub hide_name: usize,
     /// Attributes for this memory
     #[serde(default)]
-    pub attributes: HashMap<String, AttributeVal>,
+    pub attributes: IndexMap<String, AttributeVal>,
     /// Memory width
     pub width: usize,
     /// Memory size
@@ -231,7 +231,7 @@ pub struct Memory {
 }
 
 /// Represents the name of a net in a module
-#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Default)]
 pub struct Netname {
     /// Indicates an internal/auto-generated name that starts with `$`
     #[serde(default)]
@@ -249,7 +249,7 @@ pub struct Netname {
     pub signed: usize,
     /// Attributes for this netname
     #[serde(default)]
-    pub attributes: HashMap<String, AttributeVal>,
+    pub attributes: IndexMap<String, AttributeVal>,
 }
 
 impl Netlist {
@@ -257,7 +257,7 @@ impl Netlist {
     pub fn new(creator: &str) -> Self {
         Self {
             creator: creator.to_owned(),
-            modules: HashMap::new(),
+            modules: IndexMap::new(),
         }
     }
 
